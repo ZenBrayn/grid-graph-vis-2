@@ -18,8 +18,6 @@ function setup() {
   padding_y = 15;
   
   noLoop();
-
-  print(dwidth + " " + dheight);
 }
 
 //--- Main drawing function
@@ -131,7 +129,6 @@ function drawTitle() {
 function drawLabels() {
   
   for (var row=0; row<n_rows; row++) {
-    print(i);
     push();
     
   	trans_x = margin_left
