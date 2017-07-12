@@ -5,30 +5,33 @@ function setup() {
   background(0);
   noStroke();
   
-    
-  pt_size = 10;
-  ln_size = pt_size * 0.25;
-  spacing = pt_size * 10;
+  n_rows = 0;
+  n_cols = 0;
   
-  pt_color = color(100, 255);
-  ln_color = color(255, 255);
+  margin_left = 50;
+  margin_right = 200;
+  margin_top = 150;
+  margin_bottom = 200;
   
-  frame_rate = 1;
-  frameRate(frame_rate);
-  
-  margin_x = 50;
-  margin_y = 125;
-  
-  padding_x = 25;
-  padding_y = 25;
+  padding_x = 15;
+  padding_y = 15;
   
   noLoop();
 }
 
 //--- Main drawing function
 function draw() {
+  // Refresh the background;
   background(0);
+  
+  // Grid graphs
   drawAllGridGraphs();
+  
+  // Title
+  drawTitle();
+  
+  // Labels
+  drawLabels();
 }
 
 
@@ -36,15 +39,40 @@ function draw() {
 //--- Supporting drawing functions
 //--- Individual grid graphs
 function drawGridGraph(edge_nos, gg_no = -1) {
-	push();
-	
-	
-	
+	// BACKGROUND
+	push()
+	fill(50);
 	drawGraphBkg();
+	pop()
+	
+	// EDGES
+	push()
+	stroke(255);
+	strokeWeight(spacing / 10 * 0.5);
   drawGraph(edge_nos);
-  drawGrid();
-  drawNoLabel(gg_no);
+  pop()
   
+  // GRID POINTS
+  push();
+  stroke(100);
+  strokeWeight(spacing / 5);
+  drawGrid();
+  pop();
+
+  // NO. LABEL BACKGROUND
+  push();
+  stroke(255);
+  strokeWeight(spacing / 2.5);
+  drawNoBkg();
+  pop();
+  
+  // NO LABEL
+  push();
+  textAlign(CENTER, CENTER)
+	fill(0);
+	textSize(spacing / 5);
+	noStroke();
+  drawNoLabel(gg_no);
   pop();
 }
 
@@ -57,22 +85,12 @@ function drawGridGraphNo(gg_no) {
 }
 
 function drawGrid(nrows = 1, ncols = 1) {
-  push();
-  stroke(pt_color);
-  strokeWeight(pt_size);
-  
   for (var i = 1; i <= 4; i++) {
     point(vertexCoords(i)[0], vertexCoords(i)[1]);
   }
-  pop();
 }
 
-function drawGraph(edge_nos, lnc = ln_color, lns = ln_size) {
-  push()
-  
-  stroke(lnc);
-  strokeWeight(lns);
-
+function drawGraph(edge_nos) {
   var n_edges = edge_nos.length;
   
   for (var i = 0; i < n_edges; i++) {
@@ -80,39 +98,63 @@ function drawGraph(edge_nos, lnc = ln_color, lns = ln_size) {
     line(edgeCoords(edge)[0][0], edgeCoords(edge)[0][1], 
          edgeCoords(edge)[1][0], edgeCoords(edge)[1][1])
   }
-  
-  pop()
 }
 
 function drawGraphBkg() {
-	push();
-	fill(50, 255);
 	rect(0, 0, spacing, spacing);
-	pop();
 }
 
-function drawNoLabel(gg_no) {
-	push();
-	
-	stroke(ln_color);
-	strokeWeight(pt_size * 1.5);
-	point(spacing * 0.5, spacing * 0.5);
-	
-	pop();
-	
-	push();
-	
-	textAlign(CENTER, CENTER);
-	fill(0, 255);
-  textSize(8);
-	text(gg_no, spacing * 0.5, spacing * 0.5);
-	
-	pop();
+function drawNoBkg() {
+  point(spacing * 0.5, spacing * 0.5);
 }
+
+function drawNoLabel(gg_no) {	
+	text(gg_no, spacing * 0.5, spacing * 0.5);
+}
+
+//--- Interface and labels
+function drawTitle() {
+  push();
+  textSize(36);
+  noStroke();
+  fill(150);
+  text("Grids No. 2", 20, 50);
+  textSize(12);
+  fill(100);
+  text("64 grid combinations", 20 * 1.15, 70)
+  pop();
+}
+
+function drawLabels() {
+  
+  for (var row=0; row<n_rows; row++) {
+    print(i);
+    push();
+    
+  	trans_x = margin_left
+  	trans_y = (margin_top + (spacing + padding_y) * row) - spacing * 0.35;
+  	
+  	noStroke();
+  	fill(150);
+  	textSize(20);
+  	
+  	edges_txt = "Edges"
+  	if (row == 1) {
+  	  edges_txt = "Edge"
+  	}
+  	lbl_txt = String(row) + " " + edges_txt;
+  	
+  	text(lbl_txt, trans_x, trans_y);
+  	
+  	pop();
+  }
+  
+
+}
+
 
 
 //--- Drawing multiple grid graph functions
-
 function drawAllGridGraphs() {
   // bucket the grid graphs by number of edges
   var gg_list = []
@@ -132,26 +174,25 @@ function drawAllGridGraphs() {
 function drawGridGraphMatrix(gg_mtrx) {
   // Figure out the max dimensions of
   // the matrix
-  var n_rows = gg_mtrx.length;
-  var n_cols = 0;
+  n_rows = gg_mtrx.length;
+  n_cols = 0;
   for (var i=0; i<n_rows; i++) {
     n_cols = Math.max(n_cols, gg_mtrx[i].length);
   }
-  print(n_rows + " " + n_cols);
 
   // Figure out the potential dimensions for the grid graphs
-  var grid_x_px = (dwidth - (2 * margin_x) - ((n_cols - 1) * padding_x)) / n_cols ;  
-  var grid_y_px = (dheight - (2 * margin_y) - ((n_rows - 1) * padding_y)) / n_rows ;
+  var grid_x_px = (dwidth - (margin_left + margin_right) - ((n_cols - 1) * padding_x)) / n_cols ;  
+  var grid_y_px = (dheight - (margin_top + margin_bottom) - ((n_rows - 1) * padding_y)) / n_rows ;
   
   // Since we want squares, set the grid graph dimensions to the min of the above;
   if (grid_x_px < grid_y_px) {
     spacing = grid_x_px;
     // Update the y padding to fill in the space;
-    padding_y = (dheight - (2 * margin_y) - (n_rows * spacing)) / (n_rows - 1);
+    padding_y = (dheight - (margin_top + margin_bottom) - (n_rows * spacing)) / (n_rows - 1);
   } else {
     spacing = grid_y_px;
     // Update the y padding to fill in the space
-    padding_x = (dwidth - (2 * margin_x) - (n_cols * spacing)) / (n_cols - 1);
+    padding_x = (dwidth - (margin_left + margin_right) - (n_cols * spacing)) / (n_cols - 1);
   }
   
   
@@ -160,10 +201,8 @@ function drawGridGraphMatrix(gg_mtrx) {
   	for (var col=0; col<gg_mtrx[row].length; col++) {
   		push()
   		
-  		trans_x = margin_x + (spacing + padding_x) * col;
-  		trans_y = margin_y + (spacing + padding_y) * row;
-  		
-  		print(trans_x, trans_y);
+  		trans_x = margin_left + (spacing + padding_x) * col;
+  		trans_y = margin_top + (spacing + padding_y) * row;
   		
   		translate(trans_x, trans_y);
   		drawGridGraphNo(gg_mtrx[row][col]);
