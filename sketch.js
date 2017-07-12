@@ -5,16 +5,6 @@ function setup() {
   background(0);
   noStroke();
   
-  x_center = dwidth * 0.5;
-  y_center = dheight * 0.5;
-  
-  padding_pct = 0.10
-  
-  draw_mode = "single";
-  
-  if (draw_mode == "single") {
-    
-  }
     
   pt_size = 10;
   ln_size = pt_size * 0.25;
@@ -22,13 +12,12 @@ function setup() {
   
   pt_color = color(100, 255);
   ln_color = color(255, 255);
-  color_state = 1;
   
   frame_rate = 1;
   frameRate(frame_rate);
   
   margin_x = 50;
-  margin_y = 50;
+  margin_y = 125;
   
   padding_x = 25;
   padding_y = 25;
@@ -36,14 +25,109 @@ function setup() {
   noLoop();
 }
 
-
+//--- Main drawing function
 function draw() {
   background(0);
-//   translate(100,100);
-//   drawGridGraphNo(frameCount);
   drawAllGridGraphs();
 }
 
+
+
+//--- Supporting drawing functions
+//--- Individual grid graphs
+function drawGridGraph(edge_nos, gg_no = -1) {
+	push();
+	
+	
+	
+	drawGraphBkg();
+  drawGraph(edge_nos);
+  drawGrid();
+  drawNoLabel(gg_no);
+  
+  pop();
+}
+
+// Draw a specific grid graph
+// can be a number between 1 and 64
+// representing all possible combos
+function drawGridGraphNo(gg_no) {
+  var edges_on = computeGridGraphNoEdges(gg_no);
+	drawGridGraph(edges_on, gg_no);
+}
+
+function drawGrid(nrows = 1, ncols = 1) {
+  push();
+  stroke(pt_color);
+  strokeWeight(pt_size);
+  
+  for (var i = 1; i <= 4; i++) {
+    point(vertexCoords(i)[0], vertexCoords(i)[1]);
+  }
+  pop();
+}
+
+function drawGraph(edge_nos, lnc = ln_color, lns = ln_size) {
+  push()
+  
+  stroke(lnc);
+  strokeWeight(lns);
+
+  var n_edges = edge_nos.length;
+  
+  for (var i = 0; i < n_edges; i++) {
+    var edge = edge_nos[i];
+    line(edgeCoords(edge)[0][0], edgeCoords(edge)[0][1], 
+         edgeCoords(edge)[1][0], edgeCoords(edge)[1][1])
+  }
+  
+  pop()
+}
+
+function drawGraphBkg() {
+	push();
+	fill(50, 255);
+	rect(0, 0, spacing, spacing);
+	pop();
+}
+
+function drawNoLabel(gg_no) {
+	push();
+	
+	stroke(ln_color);
+	strokeWeight(pt_size * 1.5);
+	point(spacing * 0.5, spacing * 0.5);
+	
+	pop();
+	
+	push();
+	
+	textAlign(CENTER, CENTER);
+	fill(0, 255);
+  textSize(8);
+	text(gg_no, spacing * 0.5, spacing * 0.5);
+	
+	pop();
+}
+
+
+//--- Drawing multiple grid graph functions
+
+function drawAllGridGraphs() {
+  // bucket the grid graphs by number of edges
+  var gg_list = []
+  for (var i=0; i<=6; i++) {
+    gg_list[i] = [];
+  }
+  
+  for (var i=0; i<64; i++) {
+    var edges_on = computeGridGraphNoEdges(i);
+    var n_edges = edges_on.length;
+    gg_list[n_edges].push(i);
+  }
+  
+  drawGridGraphMatrix(gg_list);
+}
 
 function drawGridGraphMatrix(gg_mtrx) {
   // Figure out the max dimensions of
@@ -70,11 +154,6 @@ function drawGridGraphMatrix(gg_mtrx) {
     padding_x = (dwidth - (2 * margin_x) - (n_cols * spacing)) / (n_cols - 1);
   }
   
-/*   print(dwidth);
-  print(2*margin_x + (spacing * n_cols) + (n_cols - 1) * padding_x);
-  
-  print(dheight);
-  print(2*margin_y + (spacing * n_rows) + (n_rows - 1) * padding_y); */
   
   // Now do the drawing
   for (var row=0; row<gg_mtrx.length; row++) {
@@ -95,54 +174,18 @@ function drawGridGraphMatrix(gg_mtrx) {
 }
 
 
-function drawAllGridGraphs() {
-  // bucket the grid graphs by number of edges
-  var gg_list = []
-  for (var i=0; i<=6; i++) {
-    gg_list[i] = [];
-  }
-  
-  for (var i=1; i<=64; i++) {
-    var edges_on = computeGridGraphNoEdges(i);
-    var n_edges = edges_on.length;
-    gg_list[n_edges].push(i);
-  }
-  
-  drawGridGraphMatrix(gg_list);
-  
-/*   for (var i=0; i<=6; i++) {
-    push()
-    translate(100, 100 * (i+1) + 25);
-    var ggs = gg_list[i];
-    
-    for (var j=0; j<ggs.length; j++) {
-      translate(100 * j + 25 * (j -1), 0);
-      drawGridGraphNo(ggs[j]);
-    }
-    pop();
-  } */
-}
-
-
-
-
-function drawGridGraph(edge_nos) {
-  drawGraph(edge_nos);
-  drawGrid();
-}
-
+//--- Utility functions
 function computeGridGraphNoEdges(gg_no) {
-  if (gg_no < 1) {
-    print("out of range; setting to 1");
-    gg_no = 1;
+  if (gg_no < 0) {
+    print("out of range; setting to 0");
+    gg_no = 0;
   } else {
-    gg_no = (gg_no - 1) % 64 + 1;
+    gg_no = gg_no % 64;
   }
   
   // Convert gg_no to a binary representation
   // to see which edges are set "on"
   // need to actually go from 0 - 63 for the calc
-  gg_no = gg_no - 1;
   var gg_bin = (+gg_no).toString(2)
   
   var pad = "000000"
@@ -157,54 +200,6 @@ function computeGridGraphNoEdges(gg_no) {
     } 
   }
   return(edges_on);  
-}
-
-// Draw a specific grid graph
-// can be a number between 1 and 64
-// representing all possible combos
-function drawGridGraphNo(gg_no) {
-  var edges_on = computeGridGraphNoEdges(gg_no);
-  drawGraphBkg();
-  drawGraph(edges_on);
-  drawGrid();
-}
-
-
-function drawGrid(nrows = 1, ncols = 1) {
-  push();
-  stroke(pt_color);
-  strokeWeight(pt_size);
-  
-  for (var i = 1; i <= 4; i++) {
-    point(vertexCoords(i)[0], vertexCoords(i)[1]);
-  }
-  pop();
-}
-
-function drawGraphBkg() {
-//   drawGraph([1,2,3,4,5,6], lnc = color(50, 255), lns = spacing * 0.025);
-
-	push();
-	fill(50, 255);
-	rect(0, 0, spacing, spacing);
-	pop();
-}
-
-function drawGraph(edge_nos, lnc = ln_color, lns = ln_size) {
-  push()
-  
-  stroke(lnc);
-  strokeWeight(lns);
-
-  var n_edges = edge_nos.length;
-  
-  for (var i = 0; i < n_edges; i++) {
-    var edge = edge_nos[i];
-    line(edgeCoords(edge)[0][0], edgeCoords(edge)[0][1], 
-         edgeCoords(edge)[1][0], edgeCoords(edge)[1][1])
-  }
-  
-  pop()
 }
 
 function vertexCoords(vertex_no) {
