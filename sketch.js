@@ -1,22 +1,25 @@
 function setup() {
-  dheight = displayWidth;
-  dwidth = displayHeight;
+  dwidth = displayWidth;
+  dheight = displayHeight;
   createCanvas(dwidth, dheight);
   background(0);
   noStroke();
+  smooth();
   
   n_rows = 0;
   n_cols = 0;
   
-  margin_left = 50;
-  margin_right = 200;
+  margin_left = 25;
+  margin_right = 100;
   margin_top = 150;
-  margin_bottom = 200;
+  margin_bottom = 50;
   
   padding_x = 15;
   padding_y = 15;
   
   noLoop();
+
+  print(dwidth + " " + dheight);
 }
 
 //--- Main drawing function
@@ -115,11 +118,11 @@ function drawNoLabel(gg_no) {
 //--- Interface and labels
 function drawTitle() {
   push();
-  textSize(36);
+  textSize(spacing * 0.75);
   noStroke();
   fill(150);
   text("Grids No. 2", 20, 50);
-  textSize(12);
+  textSize(spacing * 0.25);
   fill(100);
   text("64 grid combinations", 20 * 1.15, 70)
   pop();
@@ -136,7 +139,7 @@ function drawLabels() {
   	
   	noStroke();
   	fill(150);
-  	textSize(20);
+  	textSize(spacing * 0.30);
   	
   	edges_txt = "Edges"
   	if (row == 1) {
