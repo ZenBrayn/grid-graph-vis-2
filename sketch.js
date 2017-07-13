@@ -1,7 +1,9 @@
-function setup() {
+function setup() {  
+  // these are default values, but can change
+  // in the draw() function depending on device orientation  
   dwidth = displayWidth;
   dheight = displayHeight;
-  createCanvas(dwidth, dheight);
+
   background(0);
   noStroke();
   smooth();
@@ -16,23 +18,45 @@ function setup() {
   
   padding_x = 15;
   padding_y = 15;
-  
-  noLoop();
 }
 
 //--- Main drawing function
 function draw() {
-  // Refresh the background;
-  background(0);
+  //--- Create the canvas
+  // Hack to force p5js to get the device orientation
+  // seems to only set it after the first frame loop
+  if (frameCount <= 1) {
+    // do nothing...
+  } else {
+    // Need to check for device orientation for mobile devices
+    if (deviceOrientation == "portrait" || typeof(deviceOrientation) == "undefined") {
+      dwidth = displayWidth;
+      dheight = displayHeight;
+    } else {
+  	  // flip the coords if in landscape
+      dwidth = displayHeight;
+      dheight = displayWidth;
+    }
   
-  // Grid graphs
-  drawAllGridGraphs();
+    createCanvas(dwidth, dheight);
+    
+    //--- Now actually draw the scene
+    
+    // Refresh the background;
+    background(0);
   
-  // Title
-  drawTitle();
+    // Grid graphs
+    drawAllGridGraphs();
   
-  // Labels
-  drawLabels();
+    // Title
+    drawTitle();
+  
+    // Labels
+    drawLabels();
+    
+    // stop looping
+    noLoop();
+  }
 }
 
 
@@ -273,4 +297,4 @@ function edgeCoords(edge_no) {
   }
 }
 
-
+0
