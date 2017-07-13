@@ -33,7 +33,7 @@ function draw() {
       dwidth = displayWidth;
       dheight = displayHeight;
     } else {
-  	  // flip the coords if in landscape
+      // flip the coords if in landscape
       dwidth = displayHeight;
       dheight = displayWidth;
     }
