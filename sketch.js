@@ -1,8 +1,9 @@
 function setup() {  
-  // these are default values, but can change
-  // in the draw() function depending on device orientation  
-  dwidth = displayWidth;
-  dheight = displayHeight;
+  // Using a fixed size for consistent display
+  // across devices
+  dwidth = 1500;
+  dheight = 900;
+  createCanvas(dwidth, dheight);
 
   background(0);
   noStroke();
@@ -11,52 +12,30 @@ function setup() {
   n_rows = 0;
   n_cols = 0;
   
-  margin_left = 25;
-  margin_right = 100;
+  margin_left = 50;
+  margin_right = 50;
   margin_top = 150;
   margin_bottom = 50;
   
-  padding_x = 15;
-  padding_y = 15;
+  padding_x = 20;
+  padding_y = 20;
+
+  noLoop();
 }
 
 //--- Main drawing function
 function draw() {
-  //--- Create the canvas
-  // Hack to force p5js to get the device orientation
-  // seems to only set it after the first frame loop
-  if (frameCount <= 1) {
-    // do nothing...
-  } else {
-    // Need to check for device orientation for mobile devices
-    if (deviceOrientation == "portrait" || typeof(deviceOrientation) == "undefined") {
-      dwidth = displayWidth;
-      dheight = displayHeight;
-    } else {
-      // flip the coords if in landscape
-      dwidth = displayHeight;
-      dheight = displayWidth;
-    }
-  
-    createCanvas(dwidth, dheight);
-    
-    //--- Now actually draw the scene
-    
-    // Refresh the background;
-    background(0);
-  
-    // Grid graphs
-    drawAllGridGraphs();
-  
-    // Title
-    drawTitle();
-  
-    // Labels
-    drawLabels();
-    
-    // stop looping
-    noLoop();
-  }
+  // Refresh the background;
+  background(0);
+
+  // Grid graphs
+  drawAllGridGraphs();
+
+  // Title
+  drawTitle();
+
+  // Labels
+  drawLabels();
 }
 
 
@@ -143,10 +122,11 @@ function drawTitle() {
   textSize(spacing * 0.75);
   noStroke();
   fill(150);
-  text("Grids No. 2", 20, 50);
+  textAlign(LEFT, TOP)
+  text("Grids No. 2", 30, 30);
   textSize(spacing * 0.25);
   fill(100);
-  text("64 grid combinations", 20 * 1.15, 70)
+  text("64 grid combinations", 30 * 1.15, 70)
   pop();
 }
 
@@ -218,7 +198,6 @@ function drawGridGraphMatrix(gg_mtrx) {
     // Update the y padding to fill in the space
     padding_x = (dwidth - (margin_left + margin_right) - (n_cols * spacing)) / (n_cols - 1);
   }
-  
   
   // Now do the drawing
   for (var row=0; row<gg_mtrx.length; row++) {
